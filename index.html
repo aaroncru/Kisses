@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💋</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+#kissBackground {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.kiss {
+    position: absolute;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    filter: blur(2.5px);
+    animation: floating ease-in-out infinite;
+}
+
+@keyframes floating {
+    0% {
+        margin-top: 0;
+    }
+
+    50% {
+        margin-top: -10px;
+    }
+
+    100% {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .kiss {
+        filter: blur(2px);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="kissBackground"></div>
+
+<script>
+const background = document.getElementById("kissBackground");
+
+const cantidadBesos = 40;
+
+for (let i = 0; i < cantidadBesos; i++) {
+
+    const kiss = document.createElement("div");
+
+    kiss.textContent = "💋";
+
+    kiss.className = "kiss";
+
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+
+    const size = 35 + Math.random() * 80;
+
+    const rotation = -45 + Math.random() * 90;
+
+    const opacity = 0.25 + Math.random() * 0.35;
+
+    const duration = 3 + Math.random() * 4;
+
+    const delay = Math.random() * 4;
+
+    kiss.style.left = x + "%";
+    kiss.style.top = y + "%";
+    kiss.style.fontSize = size + "px";
+    kiss.style.opacity = opacity;
+    kiss.style.transform =
+        `translate(-50%, -50%) rotate(${rotation}deg)`;
+    kiss.style.animationDuration = duration + "s";
+    kiss.style.animationDelay = delay + "s";
+
+    background.appendChild(kiss);
+}
+</script>
+
+</body>
+</html>
