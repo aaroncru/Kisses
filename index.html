@@ -51,9 +51,45 @@ body {
     }
 }
 
+.button-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.kisses-button {
+    border: none;
+    background: #e60023;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 18px 55px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.kisses-button:hover {
+    background: #c9001f;
+    transform: scale(1.08);
+}
+
+.kisses-button:active {
+    transform: scale(0.96);
+}
+
 @media (max-width: 600px) {
     .kiss {
         filter: blur(2px);
+    }
+
+    .kisses-button {
+        font-size: 21px;
+        padding: 16px 45px;
     }
 }
 </style>
@@ -62,6 +98,10 @@ body {
 <body>
 
 <div id="kissBackground"></div>
+
+<div class="button-container">
+    <button class="kisses-button">Kisses</button>
+</div>
 
 <script>
 const background = document.getElementById("kissBackground");
