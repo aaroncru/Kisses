@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -133,22 +134,6 @@ body {
 
     box-shadow:
         0 15px 45px rgba(0, 0, 0, 0.25);
-
-    animation: photoAppear 0.4s ease;
-}
-
-@keyframes photoAppear {
-
-    from {
-        transform: scale(0.85);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-
 }
 
 @media (max-width: 600px) {
@@ -274,9 +259,7 @@ for (let i = 0; i < cantidadBesos; i++) {
 }
 
 
-/* ================================
-   TUS 10 FOTOS
-================================ */
+/* FOTOS */
 
 const fotos = [
 
@@ -322,9 +305,7 @@ const fotos = [
 ];
 
 
-/* ================================
-   MOSTRAR FOTO ALEATORIA
-================================ */
+/* MOSTRAR FOTO */
 
 kissesButton.addEventListener("click", function() {
 
@@ -338,16 +319,11 @@ kissesButton.addEventListener("click", function() {
 
     photoContainer.classList.add("show");
 
-
-    setTimeout(function() {
-
-        photoContainer.classList.remove("show");
-
-    }, 3000);
-
 });
 
 </script>
 
 </body>
 </html>
+```
+
