@@ -171,6 +171,7 @@
     const foto = document.getElementById("foto");
     const fotoContainer = document.getElementById("fotoContainer");
     const contador = document.getElementById("contador");
+    const contenedorBoton = document.getElementById("contenedorBoton");
 
     for (let i = 0; i < 40; i++) {
         const kiss = document.createElement("div");
@@ -223,6 +224,7 @@
         if (fotoDelDia) {
             foto.src = fotoDelDia;
             fotoContainer.classList.add("show");
+            contenedorBoton.style.zIndex = "5";
         }
     });
 
@@ -256,18 +258,13 @@
             segundos === "00"
         ) {
             actualizarFotoDelNuevoDia();
+            contenedorBoton.style.zIndex = "30";
         }
     }
 
     function actualizarFotoDelNuevoDia() {
         fotoContainer.classList.remove("show");
         foto.src = "";
-
-        const fotoDelDia = obtenerFotoDelDia();
-
-        if (fotoDelDia) {
-            foto.src = fotoDelDia;
-        }
     }
 
     actualizarContador();
