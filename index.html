@@ -3,328 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💋</title>
+<title>Kisses</title>
 
 <style>
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html,
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: white;
-}
-
-#kissBackground {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.kiss {
-    position: absolute;
-    line-height: 1;
-    user-select: none;
-    pointer-events: none;
-    filter: blur(2.5px);
-    animation: floating ease-in-out infinite;
-}
-
-@keyframes floating {
-
-    0% {
-        margin-top: 0;
+    * {
+        box-sizing: border-box;
     }
 
-    50% {
-        margin-top: -10px;
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: white;
+        font-family: Arial, sans-serif;
     }
 
-    100% {
-        margin-top: 0;
+    body {
+        position: relative;
     }
 
-}
-
-.button-container {
-    position: fixed;
-    inset: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    z-index: 10;
-}
-
-.kisses-button {
-    border: none;
-
-    background: #e60023;
-    color: white;
-
-    font-size: 24px;
-    font-weight: bold;
-
-    padding: 18px 55px;
-
-    border-radius: 50px;
-
-    cursor: pointer;
-
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
-
-    transition:
-        transform 0.25s ease,
-        background 0.25s ease;
-}
-
-.kisses-button:hover {
-    background: #c9001f;
-
-    transform: scale(1.08);
-}
-
-.kisses-button:active {
-    transform: scale(0.96);
-}
-
-.photo-container {
-    position: fixed;
-
-    inset: 0;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    z-index: 20;
-
-    pointer-events: none;
-
-    opacity: 0;
-
-    transition: opacity 0.3s ease;
-}
-
-.photo-container.show {
-    opacity: 1;
-}
-
-.random-photo {
-    max-width: 70vw;
-    max-height: 70vh;
-
-    width: auto;
-    height: auto;
-
-    object-fit: contain;
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 15px 45px rgba(0, 0, 0, 0.25);
-}
-
-@media (max-width: 600px) {
+    #kisses {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        z-index: 1;
+    }
 
     .kiss {
-        filter: blur(2px);
+        position: absolute;
+        user-select: none;
+        pointer-events: none;
+        filter: blur(2.5px);
+        opacity: 0.25;
+        animation: flotar linear infinite;
     }
 
-    .kisses-button {
-        font-size: 21px;
+    @keyframes flotar {
+        0% {
+            transform: translateY(0) rotate(0deg);
+        }
 
-        padding:
-            16px 45px;
+        50% {
+            transform: translateY(-15px) rotate(8deg);
+        }
+
+        100% {
+            transform: translateY(0) rotate(0deg);
+        }
     }
 
-    .random-photo {
-        max-width: 85vw;
+    #contador {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        font-size: 24px;
+        font-weight: bold;
+        color: #d60000;
+        letter-spacing: 2px;
+    }
+
+    #contenedorBoton {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 30;
+    }
+
+    #boton {
+        border: none;
+        background: #e60000;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 18px 45px;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    #boton:hover {
+        background: #c00000;
+        transform: scale(1.05);
+    }
+
+    #boton:active {
+        transform: scale(0.95);
+    }
+
+    #fotoContainer {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        padding: 80px 20px 40px;
+    }
+
+    #fotoContainer.show {
+        opacity: 1;
+    }
+
+    #foto {
+        max-width: 70vw;
         max-height: 70vh;
+        object-fit: contain;
+        border-radius: 15px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
     }
 
-}
+    @media (max-width: 600px) {
+        #contador {
+            font-size: 20px;
+            top: 15px;
+        }
 
+        #boton {
+            font-size: 20px;
+            padding: 15px 35px;
+        }
+
+        #foto {
+            max-width: 85vw;
+            max-height: 70vh;
+        }
+    }
 </style>
 </head>
 
 <body>
 
-<div id="kissBackground"></div>
+<div id="kisses"></div>
 
-<div class="button-container">
+<div id="contador">24:00:00</div>
 
-    <button
-        class="kisses-button"
-        id="kissesButton">
-        Kisses
-    </button>
-
+<div id="fotoContainer">
+    <img id="foto" src="" alt="">
 </div>
 
-<div
-    class="photo-container"
-    id="photoContainer">
-
-    <img
-        class="random-photo"
-        id="randomPhoto"
-        src=""
-        alt="">
-
+<div id="contenedorBoton">
+    <button id="boton">Kisses</button>
 </div>
 
 <script>
+    const fotos = [
+        "1.jpeg",
+        "2.jpeg",
+        "3.jpeg",
+        "4.jpeg",
+        "5.jpeg",
+        "6.jpeg",
+        "7.jpeg"
+    ];
 
-const background =
-    document.getElementById("kissBackground");
+    const fechaInicio = new Date("2026-10-04T00:00:00");
 
-const kissesButton =
-    document.getElementById("kissesButton");
+    const kisses = document.getElementById("kisses");
+    const boton = document.getElementById("boton");
+    const foto = document.getElementById("foto");
+    const fotoContainer = document.getElementById("fotoContainer");
+    const contador = document.getElementById("contador");
 
-const photoContainer =
-    document.getElementById("photoContainer");
+    for (let i = 0; i < 40; i++) {
+        const kiss = document.createElement("div");
 
-const randomPhoto =
-    document.getElementById("randomPhoto");
+        kiss.className = "kiss";
+        kiss.textContent = "💋";
 
+        kiss.style.left = Math.random() * 100 + "%";
+        kiss.style.top = Math.random() * 100 + "%";
+        kiss.style.fontSize = (25 + Math.random() * 45) + "px";
+        kiss.style.opacity = 0.25 + Math.random() * 0.35;
+        kiss.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
+        kiss.style.animationDuration = (4 + Math.random() * 6) + "s";
+        kiss.style.animationDelay = (Math.random() * 5) + "s";
 
-const cantidadBesos = 40;
+        kisses.appendChild(kiss);
+    }
 
+    function obtenerDiaActual() {
+        const ahora = new Date();
 
-for (let i = 0; i < cantidadBesos; i++) {
-
-    const kiss =
-        document.createElement("div");
-
-    kiss.textContent = "💋";
-
-    kiss.className = "kiss";
-
-    const x =
-        Math.random() * 100;
-
-    const y =
-        Math.random() * 100;
-
-    const size =
-        35 + Math.random() * 80;
-
-    const rotation =
-        -45 + Math.random() * 90;
-
-    const opacity =
-        0.25 + Math.random() * 0.35;
-
-    const duration =
-        3 + Math.random() * 4;
-
-    const delay =
-        Math.random() * 4;
-
-    kiss.style.left =
-        x + "%";
-
-    kiss.style.top =
-        y + "%";
-
-    kiss.style.fontSize =
-        size + "px";
-
-    kiss.style.opacity =
-        opacity;
-
-    kiss.style.transform =
-        `translate(-50%, -50%) rotate(${rotation}deg)`;
-
-    kiss.style.animationDuration =
-        duration + "s";
-
-    kiss.style.animationDelay =
-        delay + "s";
-
-    background.appendChild(kiss);
-
-}
-
-
-/* FOTOS */
-
-const fotos = [
-
-    "1.jpeg",
-    "2.jpeg",
-    "3.jpeg",
-    "4.jpeg",
-    "5.jpeg",
-    "6.jpeg",
-    "7.jpeg",
-    "9.jpeg",
-    "10.jpeg",
-    "11.jpeg",
-    "12.jpeg",
-    "13.jpeg",
-    "14.jpeg",
-    "15.jpeg",
-    "16.jpeg",
-    "17.jpeg",
-    "18.jpeg",
-    "19.jpeg",
-    "20.jpeg",
-    "21.jpeg",
-    "22.jpeg",
-    "23.jpeg",
-    "24.jpeg",
-    "25.jpeg",
-    "26.jpeg",
-    "27.jpeg",
-    "28.jpeg",
-    "29.jpeg",
-    "30.jpeg",
-    "31.jpeg",
-    "32.jpeg",
-    "33.jpeg",
-    "34.jpeg",
-    "35.jpeg",
-    "36.jpeg",
-    "37.jpeg",
-    "38.jpeg",
-    "39.jpeg",
-    "40.jpeg",
-    "41.jpeg"
-
-];
-
-
-/* MOSTRAR FOTO */
-
-kissesButton.addEventListener("click", function() {
-
-    const indiceAleatorio =
-        Math.floor(
-            Math.random() * fotos.length
+        const hoy = new Date(
+            ahora.getFullYear(),
+            ahora.getMonth(),
+            ahora.getDate()
         );
 
-    randomPhoto.src =
-        fotos[indiceAleatorio];
+        const inicio = new Date(
+            fechaInicio.getFullYear(),
+            fechaInicio.getMonth(),
+            fechaInicio.getDate()
+        );
 
-    photoContainer.classList.add("show");
+        return Math.floor((hoy - inicio) / 86400000);
+    }
 
-});
+    function obtenerFotoDelDia() {
+        const dia = obtenerDiaActual();
 
+        if (dia < 0 || dia >= fotos.length) {
+            return null;
+        }
+
+        return fotos[dia];
+    }
+
+    boton.addEventListener("click", function() {
+        const fotoDelDia = obtenerFotoDelDia();
+
+        if (fotoDelDia) {
+            foto.src = fotoDelDia;
+            fotoContainer.classList.add("show");
+        }
+    });
+
+    function actualizarContador() {
+        const ahora = new Date();
+
+        const siguienteDia = new Date(
+            ahora.getFullYear(),
+            ahora.getMonth(),
+            ahora.getDate() + 1,
+            0,
+            0,
+            0
+        );
+
+        const diferencia = siguienteDia - ahora;
+
+        let horas = Math.floor(diferencia / 3600000);
+        let minutos = Math.floor((diferencia % 3600000) / 60000);
+        let segundos = Math.floor((diferencia % 60000) / 1000);
+
+        horas = String(horas).padStart(2, "0");
+        minutos = String(minutos).padStart(2, "0");
+        segundos = String(segundos).padStart(2, "0");
+
+        contador.textContent = `${horas}:${minutos}:${segundos}`;
+
+        if (
+            horas === "00" &&
+            minutos === "00" &&
+            segundos === "00"
+        ) {
+            actualizarFotoDelNuevoDia();
+        }
+    }
+
+    function actualizarFotoDelNuevoDia() {
+        fotoContainer.classList.remove("show");
+        foto.src = "";
+
+        const fotoDelDia = obtenerFotoDelDia();
+
+        if (fotoDelDia) {
+            foto.src = fotoDelDia;
+        }
+    }
+
+    actualizarContador();
+
+    setInterval(actualizarContador, 1000);
 </script>
 
 </body>
 </html>
-```
-
