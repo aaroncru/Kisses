@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,44 +7,121 @@
 <title></title>
 
 <style>
-    * {
-        box-sizing: border-box;
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: white;
+    font-family: Arial, sans-serif;
+}
+
+#kisses {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: white;
+    z-index: 0;
+}
+
+.kiss {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    filter: blur(2.5px);
+    animation: flotar linear infinite;
+}
+
+@keyframes flotar {
+    0%, 100% {
+        translate: 0 0;
+    }
+    50% {
+        translate: 0 -15px;
+    }
+}
+
+#dificultades {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    z-index: 2;
+}
+
+button {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    border: 1px solid #222;
+    background: rgba(255, 255, 255, 0.9);
+    color: #222;
+    padding: 11px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button.selected {
+    background: #222;
+    color: white;
+}
+
+#quizz {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 150px;
+    padding: 16px 30px;
+    font-size: 18px;
+    z-index: 2;
+}
+
+#quizz:hover {
+    transform: translate(-50%, -52%);
+}
+
+#mensaje {
+    position: fixed;
+    left: 50%;
+    top: calc(50% + 70px);
+    transform: translateX(-50%);
+    width: min(90vw, 600px);
+    text-align: center;
+    font-size: clamp(18px, 3vw, 27px);
+    font-weight: bold;
+    color: #222;
+    z-index: 2;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 480px) {
+    #dificultades {
+        top: 12px;
+        left: 12px;
+        gap: 5px;
     }
 
-    html, body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: white;
+    #dificultades button {
+        padding: 9px 10px;
+        font-size: 11px;
     }
 
-    #kisses {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        background: white;
+    #quizz {
+        top: 48%;
     }
-
-    .kiss {
-        position: absolute;
-        user-select: none;
-        pointer-events: none;
-        filter: blur(2.5px);
-        animation: flotar linear infinite;
-    }
-
-    @keyframes flotar {
-        0% {
-            translate: 0 0;
-        }
-        50% {
-            translate: 0 -15px;
-        }
-        100% {
-            translate: 0 0;
-        }
-    }
+}
 </style>
 </head>
 
@@ -51,24 +129,111 @@
 
 <div id="kisses"></div>
 
+<div id="dificultades">
+    <button type="button" data-dificultad="EASY">EASY</button>
+    <button type="button" data-dificultad="HARD">HARD</button>
+    <button type="button" data-dificultad="EXTREME">EXTREME</button>
+</div>
+
+<button type="button" id="quizz">QUIZZ</button>
+
+<div id="mensaje" aria-live="polite"></div>
+
 <script>
-    const kisses = document.getElementById("kisses");
+/* PERSONALIZA TUS PREGUNTAS AQUÍ */
+const preguntas = {
+    EASY: [
+        "Preguntas dificultad EASY coming soon...",
+        "coming soon...",
+        "ya deja de picarle pues jeje JJAJAJ xd"
+    ],
 
-    for (let i = 0; i < 40; i++) {
-        const kiss = document.createElement("div");
+    HARD: [
+        "coming soon...",
+        "ish ish ish",
+        "ya casi"
+    ],
 
-        kiss.className = "kiss";
-        kiss.textContent = "💋";
-        kiss.style.left = Math.random() * 100 + "%";
-        kiss.style.top = Math.random() * 100 + "%";
-        kiss.style.fontSize = (25 + Math.random() * 45) + "px";
-        kiss.style.opacity = 0.25 + Math.random() * 0.35;
-        kiss.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
-        kiss.style.animationDuration = (4 + Math.random() * 6) + "s";
-        kiss.style.animationDelay = (Math.random() * 5) + "s";
+    EXTREME: [
+        "pronto pronto aun no",
+        "luego le pongo preguntas",
+        "ish ish, tqm trini"
+    ]
+};
 
-        kisses.appendChild(kiss);
+/* CREAR LOS BESOS DEL FONDO */
+const kisses = document.getElementById("kisses");
+
+for (let i = 0; i < 40; i++) {
+    const kiss = document.createElement("div");
+
+    kiss.className = "kiss";
+    kiss.textContent = "💋";
+    kiss.style.left = Math.random() * 100 + "%";
+    kiss.style.top = Math.random() * 100 + "%";
+    kiss.style.fontSize = (25 + Math.random() * 45) + "px";
+    kiss.style.opacity = 0.25 + Math.random() * 0.35;
+    kiss.style.transform =
+        `rotate(${Math.random() * 60 - 30}deg)`;
+    kiss.style.animationDuration =
+        (4 + Math.random() * 6) + "s";
+    kiss.style.animationDelay =
+        (Math.random() * 5) + "s";
+
+    kisses.appendChild(kiss);
+}
+
+/* CONTROLAR LA DIFICULTAD */
+let dificultadSeleccionada = null;
+
+const mensaje = document.getElementById("mensaje");
+
+const botonesDificultad =
+    document.querySelectorAll("[data-dificultad]");
+
+botonesDificultad.forEach(boton => {
+    boton.addEventListener("click", () => {
+        dificultadSeleccionada = boton.dataset.dificultad;
+
+        botonesDificultad.forEach(otro => {
+            const seleccionado = otro === boton;
+
+            otro.classList.toggle("selected", seleccionado);
+            otro.setAttribute(
+                "aria-pressed",
+                seleccionado ? "true" : "false"
+            );
+        });
+
+        mensaje.textContent = "";
+    });
+});
+
+/* BOTÓN QUIZZ */
+document.getElementById("quizz").addEventListener("click", () => {
+
+    if (!dificultadSeleccionada) {
+        mensaje.textContent = "ELIGE UNA DIFICULTAD";
+        return;
     }
+
+    const lista = preguntas[dificultadSeleccionada].filter(
+        pregunta =>
+            typeof pregunta === "string" &&
+            pregunta.trim() !== ""
+    );
+
+    if (lista.length === 0) {
+        mensaje.textContent =
+            `Elige una dificultad ${dificultadSeleccionada}.`;
+        return;
+    }
+
+    const indiceAleatorio =
+        Math.floor(Math.random() * lista.length);
+
+    mensaje.textContent = lista[indiceAleatorio];
+});
 </script>
 
 </body>
