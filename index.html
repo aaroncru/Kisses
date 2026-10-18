@@ -195,7 +195,7 @@ button:disabled {
 
 <div id="contador">KISSES ❤️: <span id="totalKisses">0</span></div>
 
-<button type="button" id="quizz">QUIZZ</button>
+<button type="button" id="quizz">A JUGAR ISH ISH</button>
 
 <div id="panel">
     <div id="pregunta"></div>
@@ -414,13 +414,23 @@ document.getElementById("quizz").addEventListener("click", () => {
 
     const lista = preguntas[dificultadSeleccionada];
 
-    const disponibles = lista
-        .map((item, indice) => ({ ...item, indice }))
-        .filter(item =>
+const disponibles = lista
+    .map((item, indice) => ({ ...item, indice }))
+    .filter(item => {
+        const respuestas = Array.isArray(item.respuesta)
+            ? item.respuesta
+            : [item.respuesta];
+
+        return (
             item.pregunta.trim() !== "" &&
-            item.respuesta.trim() !== "" &&
+            respuestas.some(respuesta =>
+                typeof respuesta === "string" &&
+                respuesta.trim() !== ""
+            ) &&
             !contestadas[dificultadSeleccionada].has(item.indice)
         );
+    });
+
 
     if (disponibles.length === 0) {
         preguntaActual = null;
