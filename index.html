@@ -37,12 +37,8 @@ html, body {
 }
 
 @keyframes flotar {
-    0%, 100% {
-        translate: 0 0;
-    }
-    50% {
-        translate: 0 -15px;
-    }
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -15px; }
 }
 
 #dificultades {
@@ -79,7 +75,7 @@ button.selected {
 #quizz {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: 40%;
     transform: translate(-50%, -50%);
     min-width: 150px;
     padding: 16px 30px;
@@ -91,19 +87,60 @@ button.selected {
     transform: translate(-50%, -52%);
 }
 
-#mensaje {
+#zonaPregunta {
     position: fixed;
+    top: 50%;
     left: 50%;
-    top: calc(50% + 70px);
     transform: translateX(-50%);
     width: min(90vw, 600px);
     text-align: center;
+    z-index: 2;
+}
+
+#pregunta {
     font-size: clamp(18px, 3vw, 27px);
     font-weight: bold;
     color: #222;
-    z-index: 2;
     line-height: 1.4;
+    margin-bottom: 18px;
     white-space: pre-wrap;
+}
+
+#respuesta {
+    width: 100%;
+    padding: 13px 15px;
+    font-size: 16px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+#respuesta:focus {
+    border-color: #222;
+}
+
+#comprobar {
+    margin-top: 12px;
+}
+
+#resultado {
+    margin-top: 14px;
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+.correcta {
+    color: #00FF33;
+}
+
+.incorrecta {
+    color: #FF0000;
+}
+
+.oculto {
+    display: none;
 }
 
 @media (max-width: 480px) {
@@ -119,7 +156,11 @@ button.selected {
     }
 
     #quizz {
-        top: 48%;
+        top: 35%;
+    }
+
+    #zonaPregunta {
+        top: 45%;
     }
 }
 </style>
@@ -135,33 +176,84 @@ button.selected {
     <button type="button" data-dificultad="EXTREME">EXTREME</button>
 </div>
 
-<button type="button" id="quizz">QUIZZ</button>
+<button type="button" id="quizz">ISH ISH A JUGAR</button>
 
-<div id="mensaje" aria-live="polite"></div>
+<div id="zonaPregunta">
+    <div id="pregunta"></div>
+
+    <div id="zonaRespuesta" class="oculto">
+        <input
+            type="text"
+            id="respuesta"
+            placeholder="Escribe tu respuesta (solo texto)..."
+            autocomplete="off"
+        >
+
+        <br>
+
+        <button type="button" id="comprobar">COMPROBAR</button>
+
+        <div id="resultado" aria-live="polite"></div>
+    </div>
+</div>
 
 <script>
-/* PERSONALIZA TUS PREGUNTAS AQUÍ */
+
+/* PERSONALIZA AQUÍ TUS PREGUNTAS Y RESPUESTAS */
+
 const preguntas = {
     EASY: [
-        "Preguntas dificultad EASY coming soon...",
-        "coming soon...",
-        "ya deja de picarle pues jeje JJAJAJ xd"
+        {
+            pregunta: "¿Cuál es mi color favorito?",
+            respuesta: "verde"
+        },
+        {
+            pregunta: "¿Cuál es mi comida favorita?",
+            respuesta: "hamburgesas"
+        },
+        {
+            pregunta: "¿Cuantos medios hermanos tengo?",
+            respuesta: "dos"
+        },
+        {
+            pregunta: "¿Que apodo te digo?",
+            respuesta: "Trini"
+        }
     ],
 
     HARD: [
-        "coming soon...",
-        "ish ish ish",
-        "ya casi"
+        {
+            pregunta: "¿Donde fue nuestra primera salida a comer?",
+            respuesta: "Sabrozon"
+        },
+        {
+            pregunta: "¿Que te regale por el dia de las madres?",
+            respuesta: "flores"
+        },
+        {
+            pregunta: "¿Qué comiste antes de nuestro primer beso?",
+            respuesta: "brownie"
+        }
     ],
 
     EXTREME: [
-        "pronto pronto aun no",
-        "luego le pongo preguntas",
-        "ish ish, tqm trini"
+        {
+            pregunta: "¿De que color era la camiseta que llevaba el dia que me corte con la palmera?",
+            respuesta: "azul"
+        },
+        {
+            pregunta: "¿Cual es mi sabor de Arizona favorito?",
+            respuesta: "mango"
+        },
+        {
+            pregunta: "¿En que ciudad de Alaska me la pase el verano 2025?",
+            respuesta: "Anchorage"
+        }
     ]
 };
 
 /* CREAR LOS BESOS DEL FONDO */
+
 const kisses = document.getElementById("kisses");
 
 for (let i = 0; i < 40; i++) {
@@ -183,13 +275,20 @@ for (let i = 0; i < 40; i++) {
     kisses.appendChild(kiss);
 }
 
-/* CONTROLAR LA DIFICULTAD */
-let dificultadSeleccionada = null;
+/* ELEMENTOS Y ESTADO */
 
-const mensaje = document.getElementById("mensaje");
+let dificultadSeleccionada = null;
+let preguntaActual = null;
+
+const elementoPregunta = document.getElementById("pregunta");
+const zonaRespuesta = document.getElementById("zonaRespuesta");
+const campoRespuesta = document.getElementById("respuesta");
+const resultado = document.getElementById("resultado");
 
 const botonesDificultad =
     document.querySelectorAll("[data-dificultad]");
+
+/* SELECCIONAR UNA SOLA DIFICULTAD */
 
 botonesDificultad.forEach(boton => {
     boton.addEventListener("click", () => {
@@ -205,35 +304,80 @@ botonesDificultad.forEach(boton => {
             );
         });
 
-        mensaje.textContent = "";
+        preguntaActual = null;
+        elementoPregunta.textContent = "";
+        zonaRespuesta.classList.add("oculto");
+        campoRespuesta.value = "";
+        resultado.textContent = "";
+        resultado.className = "";
     });
 });
 
-/* BOTÓN QUIZZ */
-document.getElementById("quizz").addEventListener("click", () => {
+/* MOSTRAR UNA PREGUNTA ALEATORIA */
 
+document.getElementById("quizz").addEventListener("click", () => {
     if (!dificultadSeleccionada) {
-        mensaje.textContent = "ELIGE UNA DIFICULTAD";
+        elementoPregunta.textContent = "ELIGE UNA DIFICULTAD";
+        zonaRespuesta.classList.add("oculto");
         return;
     }
 
-    const lista = preguntas[dificultadSeleccionada].filter(
-        pregunta =>
-            typeof pregunta === "string" &&
-            pregunta.trim() !== ""
+    const lista = preguntas[dificultadSeleccionada].filter(item =>
+        item.pregunta.trim() !== "" &&
+        item.respuesta.trim() !== ""
     );
 
     if (lista.length === 0) {
-        mensaje.textContent =
-            `Elige una dificultad ${dificultadSeleccionada}.`;
+        elementoPregunta.textContent =
+            `Agrega preguntas y respuestas para ${dificultadSeleccionada}.`;
+        zonaRespuesta.classList.add("oculto");
         return;
     }
 
-    const indiceAleatorio =
-        Math.floor(Math.random() * lista.length);
+    const indiceAleatorio = Math.floor(Math.random() * lista.length);
+    preguntaActual = lista[indiceAleatorio];
 
-    mensaje.textContent = lista[indiceAleatorio];
+    elementoPregunta.textContent = preguntaActual.pregunta;
+    zonaRespuesta.classList.remove("oculto");
+
+    campoRespuesta.value = "";
+    resultado.textContent = "";
+    resultado.className = "";
+
+    campoRespuesta.focus();
 });
+
+/* COMPROBAR LA RESPUESTA */
+
+function comprobarRespuesta() {
+    if (!preguntaActual) return;
+
+    const respuestaUsuario = campoRespuesta.value.trim().toLocaleLowerCase();
+    const respuestaCorrecta = preguntaActual.respuesta.trim().toLocaleLowerCase();
+
+    if (respuestaUsuario === "") {
+        resultado.textContent = "ESCRIBE UNA RESPUESTA";
+        resultado.className = "incorrecta";
+        return;
+    }
+
+    if (respuestaUsuario === respuestaCorrecta) {
+        resultado.textContent = "¡RESPUESTA CORRECTA TRINI! ❤️";
+        resultado.className = "correcta";
+    } else {
+        resultado.textContent = "MUEK, INTENTA OTRA VEZ";
+        resultado.className = "incorrecta";
+    }
+}
+
+document.getElementById("comprobar").addEventListener("click", comprobarRespuesta);
+
+campoRespuesta.addEventListener("keydown", evento => {
+    if (evento.key === "Enter") {
+        comprobarRespuesta();
+    }
+});
+
 </script>
 
 </body>
