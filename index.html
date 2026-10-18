@@ -72,10 +72,29 @@ button.selected {
     color: white;
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+#contador {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 2;
+    padding: 11px 16px;
+    border: 1px solid #222;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #222;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
 #quizz {
     position: fixed;
     left: 50%;
-    top: 40%;
+    top: 38%;
     transform: translate(-50%, -50%);
     min-width: 150px;
     padding: 16px 30px;
@@ -87,30 +106,31 @@ button.selected {
     transform: translate(-50%, -52%);
 }
 
-#zonaPregunta {
+#panel {
+    display: none;
     position: fixed;
-    top: 50%;
+    top: calc(38% + 65px);
     left: 50%;
     transform: translateX(-50%);
-    width: min(90vw, 600px);
+    width: min(90vw, 560px);
     text-align: center;
     z-index: 2;
 }
 
 #pregunta {
-    font-size: clamp(18px, 3vw, 27px);
+    font-size: clamp(18px, 3vw, 26px);
     font-weight: bold;
     color: #222;
     line-height: 1.4;
     margin-bottom: 18px;
-    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 #respuesta {
     width: 100%;
     padding: 13px 15px;
     font-size: 16px;
-    border: 1px solid #aaa;
+    border: 1px solid #999;
     border-radius: 8px;
     outline: none;
     background: rgba(255, 255, 255, 0.95);
@@ -128,19 +148,8 @@ button.selected {
     margin-top: 14px;
     font-size: 17px;
     font-weight: bold;
-    line-height: 1.4;
-}
-
-.correcta {
-    color: #00FF33;
-}
-
-.incorrecta {
-    color: #FF0000;
-}
-
-.oculto {
-    display: none;
+    color: #222;
+    min-height: 24px;
 }
 
 @media (max-width: 480px) {
@@ -148,6 +157,7 @@ button.selected {
         top: 12px;
         left: 12px;
         gap: 5px;
+        max-width: 65%;
     }
 
     #dificultades button {
@@ -155,12 +165,19 @@ button.selected {
         font-size: 11px;
     }
 
-    #quizz {
-        top: 35%;
+    #contador {
+        top: 12px;
+        right: 12px;
+        padding: 9px 10px;
+        font-size: 12px;
     }
 
-    #zonaPregunta {
-        top: 45%;
+    #quizz {
+        top: 38%;
+    }
+
+    #panel {
+        top: calc(38% + 65px);
     }
 }
 </style>
@@ -176,31 +193,29 @@ button.selected {
     <button type="button" data-dificultad="EXTREME">EXTREME</button>
 </div>
 
-<button type="button" id="quizz">ISH ISH A JUGAR</button>
+<div id="contador">KISSES ❤️: <span id="totalKisses">0</span></div>
 
-<div id="zonaPregunta">
+<button type="button" id="quizz">QUIZZ</button>
+
+<div id="panel">
     <div id="pregunta"></div>
 
-    <div id="zonaRespuesta" class="oculto">
+    <form id="formRespuesta">
         <input
             type="text"
             id="respuesta"
             placeholder="Escribe tu respuesta (solo texto)..."
             autocomplete="off"
+            required
         >
+        <button type="submit" id="comprobar">COMPROBAR</button>
+    </form>
 
-        <br>
-
-        <button type="button" id="comprobar">COMPROBAR</button>
-
-        <div id="resultado" aria-live="polite"></div>
-    </div>
+    <div id="resultado" aria-live="polite"></div>
 </div>
 
 <script>
-
 /* PERSONALIZA AQUÍ TUS PREGUNTAS Y RESPUESTAS */
-
 const preguntas = {
     EASY: [
         {
@@ -209,30 +224,26 @@ const preguntas = {
         },
         {
             pregunta: "¿Cuál es mi comida favorita?",
-            respuesta: "hamburgesas"
+            respuesta: ["hamburguesas", "hamburguesa"]
         },
         {
-            pregunta: "¿Cuantos medios hermanos tengo?",
-            respuesta: "dos"
-        },
-        {
-            pregunta: "¿Que apodo te digo?",
-            respuesta: "Trini"
+            pregunta: "¿Como te digo de cariño?",
+            respuesta: "trini"
         }
     ],
 
     HARD: [
         {
-            pregunta: "¿Donde fue nuestra primera salida a comer?",
-            respuesta: "Sabrozon"
+            pregunta: "¿Que comiste antes de nuestro primer beso?",
+            respuesta: "brownie"
         },
         {
-            pregunta: "¿Que te regale por el dia de las madres?",
+            pregunta: "¿Que te regale en el dia de las madres?",
             respuesta: "flores"
         },
         {
-            pregunta: "¿Qué comiste antes de nuestro primer beso?",
-            respuesta: "brownie"
+            pregunta: "¿Cual es mi sabor de Arizona Favorito?",
+            respuesta: "mango"
         }
     ],
 
@@ -242,18 +253,89 @@ const preguntas = {
             respuesta: "azul"
         },
         {
-            pregunta: "¿Cual es mi sabor de Arizona favorito?",
-            respuesta: "mango"
+            pregunta: "¿Que hicimos en el gym la vez que fui contigo al smartfit?",
+            respuesta: ["pierna", "besarnos", "cuadricep", "cuadri"]
         },
         {
-            pregunta: "¿En que ciudad de Alaska me la pase el verano 2025?",
-            respuesta: "Anchorage"
+            pregunta: "¿Que es lo que mas me gusta de tu carita hermosa?",
+            respuesta: ["mis ojos", "ojos", "tus ojos", "todo"]
         }
     ]
 };
 
-/* CREAR LOS BESOS DEL FONDO */
+/* GUARDAR Y RECUPERAR PROGRESO */
+const CLAVE_PROGRESO = "quizzKissesProgresoV1";
 
+function cargarProgreso() {
+    try {
+        const guardado = localStorage.getItem(CLAVE_PROGRESO);
+
+        if (guardado) {
+            const datos = JSON.parse(guardado);
+
+            return {
+                total: Number.isSafeInteger(datos.total) && datos.total >= 0
+                    ? datos.total
+                    : 0,
+                contestadas: {
+                    EASY: Array.isArray(datos.contestadas?.EASY)
+                        ? datos.contestadas.EASY
+                        : [],
+                    HARD: Array.isArray(datos.contestadas?.HARD)
+                        ? datos.contestadas.HARD
+                        : [],
+                    EXTREME: Array.isArray(datos.contestadas?.EXTREME)
+                        ? datos.contestadas.EXTREME
+                        : []
+                }
+            };
+        }
+    } catch (error) {
+        console.warn("No se pudo cargar el progreso guardado.", error);
+    }
+
+    return {
+        total: 0,
+        contestadas: {
+            EASY: [],
+            HARD: [],
+            EXTREME: []
+        }
+    };
+}
+
+const progreso = cargarProgreso();
+
+const contestadas = {
+    EASY: new Set(progreso.contestadas.EASY),
+    HARD: new Set(progreso.contestadas.HARD),
+    EXTREME: new Set(progreso.contestadas.EXTREME)
+};
+
+let totalKisses = progreso.total;
+
+function guardarProgreso() {
+    try {
+        localStorage.setItem(CLAVE_PROGRESO, JSON.stringify({
+            total: totalKisses,
+            contestadas: {
+                EASY: [...contestadas.EASY],
+                HARD: [...contestadas.HARD],
+                EXTREME: [...contestadas.EXTREME]
+            }
+        }));
+    } catch (error) {
+        console.warn("No se pudo guardar el progreso.", error);
+    }
+}
+
+function actualizarContador() {
+    document.getElementById("totalKisses").textContent = totalKisses;
+}
+
+actualizarContador();
+
+/* CREAR LOS BESOS DEL FONDO */
 const kisses = document.getElementById("kisses");
 
 for (let i = 0; i < 40; i++) {
@@ -276,20 +358,21 @@ for (let i = 0; i < 40; i++) {
 }
 
 /* ELEMENTOS Y ESTADO */
-
 let dificultadSeleccionada = null;
 let preguntaActual = null;
+let indiceActual = null;
 
-const elementoPregunta = document.getElementById("pregunta");
-const zonaRespuesta = document.getElementById("zonaRespuesta");
+const mensajePregunta = document.getElementById("pregunta");
+const panel = document.getElementById("panel");
 const campoRespuesta = document.getElementById("respuesta");
 const resultado = document.getElementById("resultado");
+const formulario = document.getElementById("formRespuesta");
+const botonComprobar = document.getElementById("comprobar");
 
 const botonesDificultad =
     document.querySelectorAll("[data-dificultad]");
 
 /* SELECCIONAR UNA SOLA DIFICULTAD */
-
 botonesDificultad.forEach(boton => {
     boton.addEventListener("click", () => {
         dificultadSeleccionada = boton.dataset.dificultad;
@@ -305,80 +388,108 @@ botonesDificultad.forEach(boton => {
         });
 
         preguntaActual = null;
-        elementoPregunta.textContent = "";
-        zonaRespuesta.classList.add("oculto");
+        indiceActual = null;
+        panel.style.display = "none";
         campoRespuesta.value = "";
+        campoRespuesta.disabled = false;
+        botonComprobar.disabled = false;
         resultado.textContent = "";
-        resultado.className = "";
     });
 });
 
-/* MOSTRAR UNA PREGUNTA ALEATORIA */
-
+/* MOSTRAR UNA PREGUNTA ALEATORIA NO CONTESTADA */
 document.getElementById("quizz").addEventListener("click", () => {
+    campoRespuesta.disabled = false;
+    botonComprobar.disabled = false;
+
     if (!dificultadSeleccionada) {
-        elementoPregunta.textContent = "ELIGE UNA DIFICULTAD";
-        zonaRespuesta.classList.add("oculto");
+        preguntaActual = null;
+        indiceActual = null;
+        panel.style.display = "block";
+        mensajePregunta.textContent = "ELIGE UNA DIFICULTAD";
+        formulario.style.display = "none";
+        resultado.textContent = "";
         return;
     }
 
-    const lista = preguntas[dificultadSeleccionada].filter(item =>
-        item.pregunta.trim() !== "" &&
-        item.respuesta.trim() !== ""
-    );
+    const lista = preguntas[dificultadSeleccionada];
 
-    if (lista.length === 0) {
-        elementoPregunta.textContent =
-            `Agrega preguntas y respuestas para ${dificultadSeleccionada}.`;
-        zonaRespuesta.classList.add("oculto");
+    const disponibles = lista
+        .map((item, indice) => ({ ...item, indice }))
+        .filter(item =>
+            item.pregunta.trim() !== "" &&
+            item.respuesta.trim() !== "" &&
+            !contestadas[dificultadSeleccionada].has(item.indice)
+        );
+
+    if (disponibles.length === 0) {
+        preguntaActual = null;
+        indiceActual = null;
+        panel.style.display = "block";
+        mensajePregunta.textContent =
+            `¡Completaste todas las preguntas de ${dificultadSeleccionada}! ❤️`;
+        formulario.style.display = "none";
+        resultado.textContent = "";
         return;
     }
 
-    const indiceAleatorio = Math.floor(Math.random() * lista.length);
-    preguntaActual = lista[indiceAleatorio];
+    const elegida =
+        disponibles[Math.floor(Math.random() * disponibles.length)];
 
-    elementoPregunta.textContent = preguntaActual.pregunta;
-    zonaRespuesta.classList.remove("oculto");
+    preguntaActual = elegida;
+    indiceActual = elegida.indice;
 
+    mensajePregunta.textContent = preguntaActual.pregunta;
+    panel.style.display = "block";
+    formulario.style.display = "block";
     campoRespuesta.value = "";
     resultado.textContent = "";
-    resultado.className = "";
-
     campoRespuesta.focus();
 });
 
-/* COMPROBAR LA RESPUESTA */
+/* COMPROBAR RESPUESTA Y ACTUALIZAR CONTADOR */
+formulario.addEventListener("submit", event => {
+    event.preventDefault();
 
-function comprobarRespuesta() {
-    if (!preguntaActual) return;
+    if (!preguntaActual || indiceActual === null) return;
 
-    const respuestaUsuario = campoRespuesta.value.trim().toLocaleLowerCase();
-    const respuestaCorrecta = preguntaActual.respuesta.trim().toLocaleLowerCase();
+   const respuestaUsuario = campoRespuesta.value
+    .trim()
+    .toLocaleLowerCase();
 
-    if (respuestaUsuario === "") {
-        resultado.textContent = "ESCRIBE UNA RESPUESTA";
-        resultado.className = "incorrecta";
-        return;
+const respuestasCorrectas = Array.isArray(preguntaActual.respuesta)
+    ? preguntaActual.respuesta
+    : [preguntaActual.respuesta];
+
+const esCorrecta = respuestasCorrectas.some(respuesta =>
+    respuesta.trim().toLocaleLowerCase() === respuestaUsuario
+);
+
+if (esCorrecta) {
+    const yaContestada =
+        contestadas[dificultadSeleccionada].has(indiceActual);
+
+    if (!yaContestada) {
+        contestadas[dificultadSeleccionada].add(indiceActual);
+        totalKisses++;
+
+        actualizarContador();
+        guardarProgreso();
     }
 
-    if (respuestaUsuario === respuestaCorrecta) {
-        resultado.textContent = "¡RESPUESTA CORRECTA TRINI! ❤️";
-        resultado.className = "correcta";
-    } else {
-        resultado.textContent = "MUEK, INTENTA OTRA VEZ";
-        resultado.className = "incorrecta";
-    }
+    resultado.textContent = "¡CORRECTO TRIIINIII! ❤️ +1 KISS";
+    resultado.style.color = "#16803c";
+
+    campoRespuesta.disabled = true;
+    botonComprobar.disabled = true;
+} else {
+    resultado.textContent =
+        "Muek. Inténtalo de nuevo.";
+    resultado.style.color = "#c62828";
 }
-
-document.getElementById("comprobar").addEventListener("click", comprobarRespuesta);
-
-campoRespuesta.addEventListener("keydown", evento => {
-    if (evento.key === "Enter") {
-        comprobarRespuesta();
-    }
 });
-
 </script>
 
 </body>
 </html>
+
